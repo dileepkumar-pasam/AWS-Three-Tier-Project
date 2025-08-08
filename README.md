@@ -1,129 +1,148 @@
-🌐 3-Tier Application Deployment on AWS
+# 🌐 3-Tier Application Deployment on AWS
 
-This repository demonstrates the deployment of a 3-tier application on AWS Cloud. The application includes the following layers:
+This repository demonstrates the deployment of a **3-tier web application** on **AWS Cloud**, including:
 
-    Presentation Layer: Frontend (React)
+- **Presentation Layer**: React.js (Frontend)
+- **Application Layer**: Node.js (Backend)
+- **Data Layer**: MySQL (Local or AWS RDS)
 
-    Application Layer: Backend (Node.js)
+---
 
-    Data Layer: MySQL (Local or AWS RDS)
+## 📚 Tech Stack
 
-📚 Tech Stack
+- **Frontend**: React.js  
+- **Backend**: Node.js  
+- **Database**: MySQL  
+- **Process Manager**: PM2  
+- **Web Server (Optional)**: Nginx / Apache (Httpd)
 
-    Frontend: React.js
+---
 
-    Backend: Node.js
+## 🖥️ Frontend Setup (React)
 
-    Database: MySQL
+> Make sure Node.js is installed on your system: https://nodejs.org/
 
-🖥️ Frontend Setup (React)
+### 1. Install Dependencies
 
-    Make sure Node.js is installed on your system. Download Node.js
+    cd client
+    npm install
 
-1. Install Dependencies
+### 2. Configure API Endpoint
 
-cd client
-npm install
+Update the backend API URL in the frontend config file:
 
-2. Configure Backend API
+    vim src/pages/config.js
 
-Update the API URL used by the frontend:
+Example:
 
-vim src/pages/config.js
+    // const API_BASE_URL = "http://120.40.8.367:80"; // For production
+    const API_BASE_URL = "http://localhost:7700";     // For local development
+    export default API_BASE_URL;
 
-Replace with your actual backend server IP or localhost:
+### 3. Build for Production
 
-// const API_BASE_URL = "http://25.41.26.237:80"; // for production
-const API_BASE_URL = "http://localhost:8800"; // for local development
-export default API_BASE_URL;
+    npm run build
 
-3. Build the React App
+This will generate a production-ready app in the `client/build/` directory.  
+Serve it via Nginx, Apache, or any static web server.
 
-npm run build
+---
 
-    This will generate a production-ready version of your app in the client/build/ directory.
-    You can serve these files using Nginx, Apache, or any static web server.
+## 🛠️ Backend Setup (Node.js)
 
-🛠️ Backend Setup (Node.js)
+### 1. Install Dependencies
 
-    Ensure Node.js is installed: Download Node.js
+    cd backend
+    npm install
 
-1. Install Dependencies
+### 2. Set Up Environment Variables
 
-cd backend
-npm install
+Create a `.env` file inside the `backend/` directory:
 
-2. Create Environment Variables File
+    vim .env
 
-In the backend directory, create a .env file:
+Example content:
 
-vim .env
+    PORT=7700
+    DB_HOST=localhost
+    DB_USERNAME=root
+    DB_PASSWORD=
+    DB_NAME=3-tier-project
+    DB_PORT=3306
 
-Paste the following content:
+> Adjust values for your local setup or AWS RDS configuration.
 
-PORT=8800
-DB_HOST=localhost
-DB_USERNAME=root
-DB_PASSWORD=       # Leave blank if no password
-DB_NAME=3-tier-project
-DB_PORT=3308
+### 3. Create and Populate Database
 
-    Adjust the values depending on your local setup or AWS RDS configuration.
+Start MySQL (locally or via RDS), then run:
 
-3. Create the Database
+    mysql -h localhost -u root -P 3308 -p
 
-Start MySQL (locally or via RDS), then execute:
+Inside MySQL:
 
-mysql -h localhost -u root -P 3308 -p
+    CREATE DATABASE `3-tier-project`;
+    USE `3-tier-project`;
 
-Inside the MySQL shell:
+Then, import the schema:
 
-CREATE DATABASE `3-tier-project`;
-USE `3-tier-project`;
+    mysql -h localhost -u root -P 3308 -p 3-tier-project < test.sql
 
-Import the schema:
+> The `test.sql` file should include the required tables (e.g., `books` table).
 
-mysql -h localhost -u root -P 3308 -p 3-tier-project < test.sql
+---
 
-    test.sql should include the creation of the books table.
+## 🚀 Running Backend with PM2 (Recommended for Production)
 
-🚀 Running the Backend with PM2 (Production Recommended)
+### 1. Install PM2
 
-Install PM2 globally:
+    npm install -g pm2
 
-npm install -g pm2
+### 2. Start Backend Server
 
-Start the backend server:
+    pm2 start index.js --name "backendAPI"
 
-pm2 start index.js --name "backendAPI"
+Your backend will run on port `7700` as configured in `.env`.
 
-    This will launch your Node.js app using PM2.
-    The backend will run on port 8800 as specified in .env.
+---
 
-🔗 End-to-End Connection
+## 🔗 End-to-End Connection
 
-Once everything is set up:
+| Component   | Connection                                |
+|-------------|--------------------------------------------|
+| Frontend    | Connects to Backend: http://localhost:7700 |
+| Backend     | Connects to MySQL: localhost:3306          |
+| Frontend UI | Serve from: client/build/ (e.g., via Nginx / Httpd)|
 
-    Frontend connects to the backend via http://localhost:8800
+---
 
-    Backend communicates with MySQL running on localhost:3308
+## 📁 Project Structure
 
-    You can access your app via the frontend URL (e.g., served through Nginx)
+    3-tier-app/
+    ├── client/              # React.js frontend (Presentation Layer)
+    │   ├── build/           # Production build output
+    │   ├── src/             # Source code
+    │   │   └── pages/
+    │   │       └── config.js  # API URL configuration
+    │   └── package.json     # Frontend dependencies and scripts
+    │
+    ├── backend/             # Node.js backend (Application Layer)
+    │   ├── index.js         # Backend entry point
+    │   ├── .env             # Environment variables
+    │   ├── test.sql         # MySQL table creation script
+    │   └── package.json     # Backend dependencies and scripts
+    │
+    └── README.md            # Project documentation
 
-📁 Project Structure
+---
 
-3-tier-app/
-├── client/              # React.js frontend (Presentation Layer)
-│   ├── build/           # Production build output
-│   ├── src/             # Source code
-│   │   └── pages/
-│   │       └── config.js  # API URL configuration
-│   └── package.json     # Frontend dependencies and scripts
-│
-├── backend/             # Node.js backend (Application Layer)
-│   ├── index.js         # Entry point of backend server
-│   ├── .env             # Environment variables
-│   ├── test.sql         # MySQL table creation script
-│   └── package.json     # Backend dependencies and scripts
-│
-└── README.md            # Project documentation
+
+## 🧑‍💻 Author
+
+**Dileep Kumar**
+
+---
+
+
+## 📝 License
+
+This project is open-source and available under the MIT License.
