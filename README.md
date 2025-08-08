@@ -1,97 +1,129 @@
-   #  3 tier Application
+🌐 3-Tier Application Deployment on AWS
 
-✨This repository is created to learn and deploy  3-tier application on aws cloud. this project contain three layer Presentation, Application and database
+This repository demonstrates the deployment of a 3-tier application on AWS Cloud. The application includes the following layers:
 
+    Presentation Layer: Frontend (React)
 
+    Application Layer: Backend (Node.js)
 
-## Tech stack
+    Data Layer: MySQL (Local or AWS RDS)
 
-- React 
-- Nodejs
-- MySQL
+📚 Tech Stack
 
-## 🖥️ Installation of frontend
+    Frontend: React.js
 
-**Note**: You should have nodejs installed on your system. [Node.js](https://nodejs.org/)
+    Backend: Node.js
 
-👉 let install dependency to run react application
+    Database: MySQL
 
-```sh
+🖥️ Frontend Setup (React)
+
+    Make sure Node.js is installed on your system. Download Node.js
+
+1. Install Dependencies
+
 cd client
 npm install
-```
 
-**Note**: you have to change one file for backend API. you will find that `src/pages/config.js`
+2. Configure Backend API
 
-```sh
+Update the API URL used by the frontend:
+
 vim src/pages/config.js
-```
 
-```javascript
-// const API_BASE_URL = "http://25.41.26.237:80"; // on live backend server which is running on port 80
-const API_BASE_URL = "http://localhost:portNumber";
+Replace with your actual backend server IP or localhost:
+
+// const API_BASE_URL = "http://25.41.26.237:80"; // for production
+const API_BASE_URL = "http://localhost:8800"; // for local development
 export default API_BASE_URL;
-```
-make sure you EDIT above file depends on your scenario
 
+3. Build the React App
 
-```sh
-npm run build 
-```
+npm run build
 
-above command creat optimize build of the application in client folder. `build/` you will find all the files that you can serve through **Apache** or **Nginx**
-that's the whole setup of the frontend
+    This will generate a production-ready version of your app in the client/build/ directory.
+    You can serve these files using Nginx, Apache, or any static web server.
 
-##  🖥️ ️Installation of backend
+🛠️ Backend Setup (Node.js)
 
-**Note**: You should have nodejs installed on your system. [Node.js](https://nodejs.org/)
+    Ensure Node.js is installed: Download Node.js
 
-👉 let install dependency to run Nodejs  API
+1. Install Dependencies
 
-```sh
 cd backend
 npm install
-```
-Now we need to create .env file that holds all the configuration details of the backend. you should be in backend directory
 
-```sh
+2. Create Environment Variables File
+
+In the backend directory, create a .env file:
+
 vim .env
-```
-add below content 
 
-```javascript
-DB_HOST=localhost or URL_of_RDS
-DB_USERNAME=user_name_of_MySQL
-DB_PASSWORD=passwod_of_my_sql
-PORT=3306
-```
-**Note** : please change above file depending on your setup. like you may use RDS(AWS) or Local mysql-server on your system. your mysql contain database with the name of `test` and it should has `books` table. You can you test.sql to create table 
+Paste the following content:
 
+PORT=8800
+DB_HOST=localhost
+DB_USERNAME=root
+DB_PASSWORD=       # Leave blank if no password
+DB_NAME=3-tier-project
+DB_PORT=3308
 
-```sh
-mysql -h <<RDS_ENDPOINT OR localhost>> -u <<USER_NAME>> -p<<PASSWORD>>
+    Adjust the values depending on your local setup or AWS RDS configuration.
 
-CREATE DATABASE test;
+3. Create the Database
 
-mysql -h <<RDS_ENDPOINT OR localhost>> -u <<USER_NAME>> -p<<PASSWORD>> test < test.sql
-```
+Start MySQL (locally or via RDS), then execute:
 
+mysql -h localhost -u root -P 3308 -p
 
-please install pm2 if you want to run on cloud. you may need sudo privilages to installed it because we are going to installed globally.
+Inside the MySQL shell:
 
-```sh
+CREATE DATABASE `3-tier-project`;
+USE `3-tier-project`;
+
+Import the schema:
+
+mysql -h localhost -u root -P 3308 -p 3-tier-project < test.sql
+
+    test.sql should include the creation of the books table.
+
+🚀 Running the Backend with PM2 (Production Recommended)
+
+Install PM2 globally:
+
 npm install -g pm2
-```
 
-now you can run this application. make sure you are in backend directory
+Start the backend server:
 
-
-```sh
 pm2 start index.js --name "backendAPI"
-```
 
-above command will start node server on port 80, you can modify the port number in `index.js` file
+    This will launch your Node.js app using PM2.
+    The backend will run on port 8800 as specified in .env.
 
-✈️ Now we are Ready to see the application
+🔗 End-to-End Connection
 
-**Thank you so much for reading..😅**
+Once everything is set up:
+
+    Frontend connects to the backend via http://localhost:8800
+
+    Backend communicates with MySQL running on localhost:3308
+
+    You can access your app via the frontend URL (e.g., served through Nginx)
+
+📁 Project Structure
+
+3-tier-app/
+├── client/              # React.js frontend (Presentation Layer)
+│   ├── build/           # Production build output
+│   ├── src/             # Source code
+│   │   └── pages/
+│   │       └── config.js  # API URL configuration
+│   └── package.json     # Frontend dependencies and scripts
+│
+├── backend/             # Node.js backend (Application Layer)
+│   ├── index.js         # Entry point of backend server
+│   ├── .env             # Environment variables
+│   ├── test.sql         # MySQL table creation script
+│   └── package.json     # Backend dependencies and scripts
+│
+└── README.md            # Project documentation
